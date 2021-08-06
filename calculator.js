@@ -1,8 +1,13 @@
 const operate = function (operator, x, y) {
 
    if (parseFloat(x) && parseFloat(y)) {
+      console.log("x: " + x);
+      console.log("y: " + y);
       x = parseFloat(x);
       y = parseFloat(y);
+      console.log("x: " + x);
+      console.log("y: " + y);
+      console.log("x times y: " + x * y);
       switch (operator) {
          case 'add':
             return x + y;
@@ -19,21 +24,25 @@ const operate = function (operator, x, y) {
       }
    }
    else {
-      return "ERROR!";
+      return DIVISION_BY_ZERO_MESSAGE;
    }
 
 
 };
 const INITIAL_VALUE = null;
 const INITIAL_DISPLAY_VALUE = "0";
+const DIVISION_BY_ZERO_MESSAGE = "Not today you don't!";
 let displayValue;// = INITIAL_VALUE;
 let firstOperand;
 let secondOperand;
 let buildNextOperand;
 let currentOperator;
+let hasCurrentDecimalPoint;
 
 const result = document.getElementById("result");
 const buttons = document.querySelectorAll("button");
+const canvas = document.getElementById("canvas");
+
 initializeValues();
 
 
@@ -44,7 +53,7 @@ for (const button of buttons) {
 
       // console.log(isNumber(button));
       if (isNumber(button)) { // Is this a number?
-         if (result.value === "0" || buildNextOperand) {
+         if (result.value === "0" || result.Value === DIVISION_BY_ZERO_MESSAGE || buildNextOperand) {
             result.value = "";
             buildNextOperand = false;
          }
@@ -55,6 +64,9 @@ for (const button of buttons) {
       else if (isClear(button)) {
          initializeValues();
       }
+      else if (isDecimalPoint(button)) {
+         insertDecimalPoint();
+      }
       else if (isOperator(button)) {
          if (currentOperator !== null) {
             calculate();
@@ -62,15 +74,20 @@ for (const button of buttons) {
          firstOperand = result.value;
          currentOperator = button.id;
          buildNextOperand = true;
-
-
       }
+
       else if (isEquals(button)) {
-         calculate();
+         if (currentOperator !== null) {
+            calculate();
+         }
+         firstOperand = result.value;
+         buildNextOperand = true;
       }
 
    })
 };
+
+
 function calculate() {
    if (currentOperator === null || buildNextOperand) {
       return;
@@ -80,88 +97,9 @@ function calculate() {
       secondOperand = result.value;
       result.value = operate(currentOperator, firstOperand, secondOperand);
       currentOperator = null;
+      hasCurrentDecimalPoint = false;
    }
 }
-// for (const button of buttons) {
-//    button.addEventListener('click', function (event) {
-//       // console.log(button.id);
-//       // check to see if the button pushed is an operation button or a number
-
-//       // console.log(isNumber(button));
-//       if (isNumber(button)) { // Is this a number?
-//          if (result.value === "0") {
-//             displayValue = button.id;
-//             result.value = displayValue.toString();
-//             // firstOperand = result.value;
-//          }
-//          else {
-//             // if the previous button was a number, then keep building the number
-//             // console.log(priorButton + "-before");
-//             // console.log(priorButton.id + "        before");
-//             if (isNumber(priorButton)) {
-//                // console.log(priorButton + "-after");
-//                // console.log(priorButton.id + "      after");
-
-//                displayValue = result.value + button.id;
-//                result.value = displayValue.toString();
-//             }
-//             else { // otherwise set the number to be built and assign to correct operand
-//                if (firstOperand === null) {
-//                   firstOperand = result.value;
-//                   firstOperandComplete = true;
-//                }
-//                else {
-//                   secondOperand = result.value;
-//                   // secondOperandComplete = true;
-//                }
-
-//             }
-//          }
-//          // console.log("We be a number");
-//       }
-//       else if (isClear(button)) {
-//          initializeValues();
-//       }
-//       else if (isOperator(button)) {
-//          currentOperator = button.id;
-//          // console.log(currentOperator);
-//          // console.log(firstOperand);
-//          // console.log(secondOperand);
-//          // console.log(resultValue);
-//          // console.log("storedValue: " + storedValue);
-//          // console.log("displayValue before: " + displayValue);
-
-//          if (firstOperand === null) {
-//             firstOperand = result.value;
-//          }
-//          else {
-//             firstOperandComplete = true;
-//          }
-
-//          if (firstOperandComplete === true) {
-//             secondOperand = result.value;
-//             resultValue = operate(button.id, firstOperand, secondOperand);
-//             displayValue = operate(button.id, firstOperand, secondOperand);
-//             firstOperandComplete = true;
-//          }
-//          else {
-//             firstOperand = result.value;
-//             firstOperandComplete = true;
-//          }
-//          // console.log(firstOperand);
-//          // console.log(secondOperand);
-//          // console.log(resultValue);
-//          // console.log("displayValue after: " + displayValue);
-//          result.value = displayValue;
-
-//       };
-//       // set prior button
-
-//       setPriorButton(button);
-
-
-//    })
-// };
 
 function isNumber(button) {
    // console.log("isNumber function");
@@ -181,6 +119,10 @@ function isEquals(button) {
    console.log(button.classList.contains("equals"));
    return (button.classList.contains("equals"));
 }
+function isDecimalPoint(button) {
+   console.log(button.classList.contains("decimal"));
+   return (button.classList.contains("decimal"));
+}
 function initializeValues() {
    displayValue = INITIAL_DISPLAY_VALUE;
    storedValue = INITIAL_VALUE;
@@ -193,7 +135,27 @@ function initializeValues() {
    secondOperandComplete = false;
    currentOperator = INITIAL_VALUE;
    buildNextOperand = false;
+   hasCurrentDecimalPoint = false;
 };
-
+function sendValuesToConsole() {
+   console.log("displayValue: " + displayValue);
+   console.log("storedValue: " + storedValue);
+   console.log("firstOperand: " + firstOperand);
+   console.log("secondOperand: " + secondOperand);
+   console.log("resultValue: " + resultValue);
+   console.log("priorButton: " + priorButton);
+   console.log("result.value: " + result.value);
+   console.log("firstOperandComplete: " + firstOperandComplete);
+   console.log("secondOperandComplete: " + secondOperandComplete);
+   console.log("currentOperator: " + currentOperator);
+   console.log("buildNextOperand: " + buildNextOperand);
+   console.log("hasCurrentDecimalPoint: " + hasCurrentDecimalPoint);
+};
+function insertDecimalPoint() {
+   if (!hasCurrentDecimalPoint) {
+      result.value = result.value + ".";
+      hasCurrentDecimalPoint = true;
+   }
+}
 
 module.exports = operate;
