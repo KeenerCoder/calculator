@@ -1,24 +1,28 @@
 const operate = function (operator, x, y) {
 
    if (parseFloat(x) && parseFloat(y)) {
-      console.log("x: " + x);
-      console.log("y: " + y);
+      // console.log("x: " + x);
+      // console.log("y: " + y);
       x = parseFloat(x);
       y = parseFloat(y);
-      console.log("x: " + x);
-      console.log("y: " + y);
-      console.log("x times y: " + x * y);
+      // console.log("x: " + x);
+      // console.log("y: " + y);
+      // console.log(operator);
       switch (operator) {
          case 'add':
+         case '+':
             return x + y;
             break;
          case 'subtract':
+         case '-':
             return x - y;
             break;
          case 'multiply':
+         case '*':
             return x * y;
             break;
          case 'divide':
+         case '/':
             return x / y;
             break;
       }
@@ -31,7 +35,7 @@ const operate = function (operator, x, y) {
 };
 const INITIAL_VALUE = null;
 const INITIAL_DISPLAY_VALUE = "0";
-const DIVISION_BY_ZERO_MESSAGE = "Not today you don't!";
+const DIVISION_BY_ZERO_MESSAGE = "Dividing by ZERO?? Not today you don't!";
 let displayValue;// = INITIAL_VALUE;
 let firstOperand;
 let secondOperand;
@@ -41,12 +45,12 @@ let hasCurrentDecimalPoint;
 
 const result = document.getElementById("result");
 const buttons = document.querySelectorAll("button");
-const canvas = document.getElementById("canvas");
 
 initializeValues();
 
 
 for (const button of buttons) {
+
    button.addEventListener('click', function (event) {
       // console.log(button.id);
       // check to see if the button pushed is an operation button or a number
@@ -83,10 +87,48 @@ for (const button of buttons) {
          firstOperand = result.value;
          buildNextOperand = true;
       }
-
+      this.blur(); // remove focus from button
    })
 };
 
+
+document.addEventListener('keydown', function (event) {
+
+   // check to see if the key entered is an operation key or a number
+   keyEntered = event.key;
+
+   if (isKeyboardNumber(keyEntered)) { // Is this a number?
+      if (result.value === "0" || result.Value === DIVISION_BY_ZERO_MESSAGE || buildNextOperand) {
+         result.value = "";
+         buildNextOperand = false;
+      }
+      displayValue = result.value + keyEntered;
+      result.value = displayValue.toString();
+
+   }
+   else if (isKeyboardClear(keyEntered)) {
+      initializeValues();
+   }
+   else if (isKeyboardDecimalPoint(keyEntered)) {
+      insertDecimalPoint();
+   }
+   else if (isKeyboardOperator(keyEntered)) {
+      if (currentOperator !== null) {
+         calculate();
+      }
+      firstOperand = result.value;
+      currentOperator = keyEntered;
+      buildNextOperand = true;
+   }
+   else if (isKeyboardEquals(keyEntered)) {
+      if (currentOperator !== null) {
+         calculate();
+      }
+      firstOperand = result.value;
+      buildNextOperand = true;
+   }
+
+});
 
 function calculate() {
    if (currentOperator === null || buildNextOperand) {
@@ -103,7 +145,7 @@ function calculate() {
 
 function isNumber(button) {
    // console.log("isNumber function");
-   return !isNaN(button.id);
+   return (!isNaN(button.id));
 };
 function isClear(button) {
    // console.log("isClear function");
@@ -112,17 +154,41 @@ function isClear(button) {
 function isOperator(button) {
    // console.log("isOperator function");
 
-   console.log(button.classList.contains("operator"));
+   //console.log(button.classList.contains("operator"));
    return (button.classList.contains("operator"));
 };
 function isEquals(button) {
-   console.log(button.classList.contains("equals"));
+   // console.log(button.classList.contains("equals"));
    return (button.classList.contains("equals"));
-}
+};
 function isDecimalPoint(button) {
-   console.log(button.classList.contains("decimal"));
+   // console.log(button.classList.contains("decimal"));
    return (button.classList.contains("decimal"));
-}
+};
+function isKeyboardNumber(keyEntered) {
+   // console.log(keyEntered);
+   return (!isNaN(keyEntered));
+};
+function isKeyboardClear(keyEntered) {
+   // console.log(keyEntered);
+   return (keyEntered === "Escape");
+};
+function isKeyboardOperator(keyEntered) {
+   // console.log(keyEntered);
+
+   return (keyEntered === "+" ||
+      keyEntered === "-" ||
+      keyEntered === "*" ||
+      keyEntered === "/");
+};
+function isKeyboardEquals(keyEntered) {
+   // console.log(keyEntered);
+   return (keyEntered === "=" || keyEntered === "Enter");
+};
+function isKeyboardDecimalPoint(keyEntered) {
+   // console.log(keyEntered);
+   return (keyEntered === ".");
+};
 function initializeValues() {
    displayValue = INITIAL_DISPLAY_VALUE;
    storedValue = INITIAL_VALUE;

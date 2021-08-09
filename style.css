@@ -1,10 +1,7 @@
 .grid-container{
    display: grid;
-   grid-column-gap: 5px;
-   grid-row-gap: 5px;
+   gap:5px;
    grid-template-columns: auto auto auto auto auto;
-   grid-template-rows: auto auto auto auto auto;
-
 }
 button{
    font-size: 20px;
@@ -23,6 +20,9 @@ button{
    grid-column: 1 / span 4;
 }
 #result{
+   width:auto;
+   grid-column: 1 / span 4;
    text-align: right;
    font-size: 20px;
+   background-color: white;
 }
